@@ -1,0 +1,8 @@
+services:
+  faktura:
+    build: .
+    network_mode: bridge
+    ports:
+      - "41414:8000"
+    volumes:
+      - ./data:/data

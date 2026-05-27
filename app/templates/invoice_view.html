@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Faktura {{ invoice.invoice_number }}</h1>
+
+<p><a href="/invoices/{{ invoice.id }}/pdf" target="_blank">Åpne PDF</a></p>
+
+<p><b>Kunde:</b> {{ invoice.customer_name }}</p>
+<p><b>Dato:</b> {{ invoice.invoice_date }}</p>
+<p><b>Forfall:</b> {{ invoice.due_date }}</p>
+
+<table border="1" cellpadding="6">
+    <tr>
+        <th>Beskrivelse</th>
+        <th>Antall</th>
+        <th>Enhet</th>
+        <th>Pris</th>
+        <th>MVA %</th>
+        <th>Sum</th>
+    </tr>
+    {% for line in lines %}
+    <tr>
+        <td>{{ line.description }}</td>
+        <td>{{ line.quantity }}</td>
+        <td>{{ line.unit }}</td>
+        <td>{{ "%.2f"|format(line.unit_price) }}</td>
+        <td>{{ line.vat_percent }}</td>
+        <td>{{ "%.2f"|format(line.line_total) }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<p><b>Netto:</b> {{ "%.2f"|format(invoice.subtotal) }}</p>
+<p><b>MVA:</b> {{ "%.2f"|format(invoice.vat_total) }}</p>
+<p><b>Å betale:</b> {{ "%.2f"|format(invoice.total) }}</p>
+
+{% endblock %}

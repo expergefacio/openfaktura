@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Firmaoppsett</h1>
+
+{% if company %}
+<p><b>Fakturanummer-start er låst:</b> {{ company.invoice_number_start }}</p>
+{% endif %}
+
+<form method="post">
+    <p>
+        Type *<br>
+        <select name="seller_type" id="seller_type" onchange="sellerTypeChanged()" required>
+            <option value="company" {% if not company or company.seller_type == "company" %}selected{% endif %}>Firma</option>
+            <option value="private" {% if company and company.seller_type == "private" %}selected{% endif %}>Privatperson</option>
+        </select>
+    </p>
+
+    <p>Navn *<br><input name="name" required value="{{ company.name if company else '' }}"></p>
+
+    <p id="orgnr_wrap">Org.nr<br><input name="orgnr" id="orgnr" value="{{ company.orgnr if company else '' }}"></p>
+
+    <div id="company_only">
+        <p><label><input type="checkbox" name="mva" {% if company and company.mva %}checked{% endif %}> MVA-registrert</label></p>
+        <p><label><input type="checkbox" name="foretaksregisteret" {% if company and company.foretaksregisteret %}checked{% endif %}> Foretaksregisteret</label></p>
+    </div>
+
+    <p>Adresse<br><textarea name="address">{{ company.address if company else '' }}</textarea></p>
+    <p>E-post<br><input name="email" value="{{ company.email if company else '' }}"></p>
+    <p>Telefon<br><input name="phone" value="{{ company.phone if company else '' }}"></p>
+    <p>Bankkonto<br><input name="bank_account" value="{{ company.bank_account if company else '' }}"></p>
+
+    <p>Vår ref.<br><input name="contact_name" value="{{ company.contact_name if company else '' }}"></p>
+    <p>Ref. e-post<br><input name="contact_email" value="{{ company.contact_email if company else '' }}"></p>
+    <p>Ref. telefon<br><input name="contact_phone" value="{{ company.contact_phone if company else '' }}"></p>
+
+    {% if not company %}
+    <p>Eksisterende/siste fakturanummer *<br><input name="invoice_number_start" required type="number"></p>
+    {% endif %}
+
+    <button>Lagre</button>
+</form>
+
+<script>
+function sellerTypeChanged() {
+    const type = document.getElementById("seller_type").value;
+    const companyOnly = document.getElementById("company_only");
+    const orgnr = document.getElementById("orgnr");
+
+    if (type === "private") {
+        companyOnly.style.display = "none";
+        orgnr.required = false;
+    } else {
+        companyOnly.style.display = "block";
+        orgnr.required = false;
+    }
+}
+
+sellerTypeChanged();
+</script>
+
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Varer/tjenester</h1>
+
+<p>
+    <button onclick="addProduct()">Legg til vare/tjeneste</button>
+    <button onclick="saveProducts()">Lagre</button>
+</p>
+
+<div id="sheet"></div>
+
+<script>
+let spreadsheet;
+let sheet;
+
+const productColumns = [
+    "id",
+    "name",
+    "description",
+    "unit",
+    "unit_price",
+    "vat_percent"
+];
+
+function objectRowsToArrayRows(rows) {
+    return rows.map(r => productColumns.map(k => r[k] ?? ""));
+}
+
+function arrayRowsToObjectRows(rows) {
+    return rows.map(r => {
+        let obj = {};
+        productColumns.forEach((key, i) => obj[key] = r[i] ?? "");
+        return obj;
+    });
+}
+
+fetch("/api/products")
+    .then(r => r.json())
+    .then(rows => {
+        spreadsheet = jspreadsheet(document.getElementById("sheet"), {
+            worksheets: [{
+                data: objectRowsToArrayRows(rows),
+                columns: [
+                    { type: "hidden", title: "ID", width: 50 },
+                    { type: "text", title: "Navn *", width: 180 },
+                    { type: "text", title: "Beskrivelse", width: 300 },
+                    { type: "text", title: "Enhet", width: 80 },
+                    { type: "numeric", title: "Pris *", width: 100 },
+                    { type: "numeric", title: "MVA % *", width: 100 }
+                ],
+                minDimensions: [6, Math.max(rows.length + 1, 10)]
+            }]
+        });
+
+        sheet = spreadsheet[0];
+    });
+
+function addProduct() {
+    sheet.insertRow();
+}
+
+function saveProducts() {
+    const rows = arrayRowsToObjectRows(sheet.getData());
+
+    fetch("/api/products", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(rows)
+    })
+    .then(r => r.json())
+    .then(() => alert("Lagret"));
+}
+</script>
+
+{% endblock %}

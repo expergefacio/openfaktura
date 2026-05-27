@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Ny faktura</h1>
+
+<form method="post">
+
+    <p>
+        Kunde *<br>
+        <select name="customer_id" id="customer_id" required onchange="customerChanged()">
+            <option value="">Velg kunde</option>
+            {% for c in customers %}
+            <option value="{{ c.id }}">{{ c.name }}</option>
+            {% endfor %}
+        </select>
+    </p>
+
+    <p>
+        Fakturadato *<br>
+        <input type="date" name="invoice_date" value="{{ today }}" required>
+    </p>
+
+    <p>
+        Forfallsdato *<br>
+        <input type="date" name="due_date" value="{{ due }}" required>
+    </p>
+
+    <p>
+        Leveringssted<br>
+        <textarea name="delivery_place" id="delivery_place"></textarea>
+    </p>
+
+    <p>
+        Leveringsdato<br>
+        <input type="date" name="delivery_date" value="{{ today }}">
+    </p>
+
+    <h2>Linjer</h2>
+
+    <table id="lines" border="1" cellpadding="6">
+        <tr>
+            <th>Produkt</th>
+            <th>Beskrivelse *</th>
+            <th>Antall *</th>
+            <th>Enhet</th>
+            <th>Pris *</th>
+            <th>MVA % *</th>
+        </tr>
+    </table>
+
+    <p>
+        <button type="button" onclick="addLine()">Legg til linje</button>
+    </p>
+
+    <p>
+        <button type="submit">Opprett låst faktura</button>
+    </p>
+</form>
+
+<script>
+const customers = {
+{% for c in customers %}
+    "{{ c.id }}": {
+        address: {{ (c.address or '')|tojson }}
+    },
+{% endfor %}
+};
+
+const products = {
+{% for p in products %}
+    "{{ p.id }}": {
+        name: {{ (p.name or '')|tojson }},
+        description: {{ (p.description or '')|tojson }},
+        unit: {{ (p.unit or '')|tojson }},
+        unit_price: {{ p.unit_price or 0 }},
+        vat_percent: {{ p.vat_percent or 0 }}
+    },
+{% endfor %}
+};
+
+function customerChanged() {
+    const id = document.getElementById("customer_id").value;
+    const customer = customers[id];
+
+    if (!customer) return;
+
+    document.getElementById("delivery_place").value =
+        customer.address || "";
+}
+
+function addLine() {
+
+    const table = document.getElementById("lines");
+
+    const row = table.insertRow(-1);
+
+    const rowId = Date.now() + "_" + Math.random();
+
+    row.innerHTML = `
+        <td>
+            <select onchange="productChanged(this, '${rowId}')">
+                <option value="">Velg produkt</option>
+
+                {% for p in products %}
+                <option value="{{ p.id }}">{{ p.name }}</option>
+                {% endfor %}
+            </select>
+        </td>
+
+        <td>
+            <input id="description_${rowId}" name="description[]" required>
+        </td>
+
+        <td>
+            <input name="quantity[]" type="number" step="0.01" value="1" required>
+        </td>
+
+        <td>
+            <input id="unit_${rowId}" name="unit[]">
+        </td>
+
+        <td>
+            <input id="price_${rowId}" name="unit_price[]" type="number" step="0.01" required>
+        </td>
+
+        <td>
+            <input id="vat_${rowId}" name="vat_percent[]" type="number" step="0.01" required>
+        </td>
+    `;
+}
+
+function productChanged(select, rowId) {
+
+    const product = products[select.value];
+
+    if (!product) return;
+
+    document.getElementById("description_" + rowId).value =
+        product.description || product.name || "";
+
+    document.getElementById("unit_" + rowId).value =
+        product.unit || "";
+
+    document.getElementById("price_" + rowId).value =
+        product.unit_price || 0;
+
+    document.getElementById("vat_" + rowId).value =
+        product.vat_percent || 0;
+}
+
+addLine();
+</script>
+
+{% endblock %}

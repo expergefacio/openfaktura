@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="no">
+<head>
+    <meta charset="utf-8">
+
+    <title>Faktura</title>
+
+    <link rel="stylesheet" href="/static/vendor/jsuites/jsuites.min.css">
+    <link rel="stylesheet" href="/static/vendor/jspreadsheet-ce/jspreadsheet.min.css">
+
+    <script src="/static/vendor/jsuites/jsuites.min.js"></script>
+    <script src="/static/vendor/jspreadsheet-ce/index.min.js"></script>
+
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 2rem;
+        }
+
+        nav a {
+            margin-right: 1rem;
+        }
+
+        button {
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="/">Start</a>
+    <a href="/customers">Kunder</a>
+    <a href="/products">Varer/tjenester</a>
+    <a href="/invoices/new">Ny faktura</a>
+    <a href="/invoices">Fakturaer</a>
+    <a href="/logout">Logg ut</a>
+</nav>
+
+<hr>
+
+{% block content %}{% endblock %}
+
+</body>
+</html>

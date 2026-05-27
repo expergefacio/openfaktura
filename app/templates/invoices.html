@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Fakturaer</h1>
+
+<p><a href="/invoices/new">Ny faktura</a></p>
+
+<table border="1" cellpadding="6">
+    <tr>
+        <th>Nr</th>
+        <th>Dato</th>
+        <th>Kunde</th>
+        <th>Forfall</th>
+        <th>Sum</th>
+        <th></th>
+    </tr>
+    {% for inv in invoices %}
+    <tr>
+        <td>{{ inv.invoice_number }}</td>
+        <td>{{ inv.invoice_date }}</td>
+        <td>{{ inv.customer_name }}</td>
+        <td>{{ inv.due_date }}</td>
+        <td>{{ "%.2f"|format(inv.total) }}</td>
+        <td><a href="/invoices/{{ inv.id }}">Åpne</a></td>
+    </tr>
+    {% endfor %}
+</table>
+
+{% endblock %}

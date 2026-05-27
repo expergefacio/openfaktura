@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Kunder</h1>
+
+<p>
+    <button onclick="addCustomer()">Legg til kunde</button>
+    <button onclick="saveCustomers()">Lagre</button>
+</p>
+
+<div id="sheet"></div>
+
+<script>
+let spreadsheet;
+let sheet;
+
+const customerColumns = [
+    "id",
+    "name",
+    "orgnr",
+    "address",
+    "email",
+    "phone",
+    "contact_name",
+    "contact_email",
+    "contact_phone"
+];
+
+function objectRowsToArrayRows(rows) {
+    return rows.map(r => customerColumns.map(k => r[k] ?? ""));
+}
+
+function arrayRowsToObjectRows(rows) {
+    return rows.map(r => {
+        let obj = {};
+        customerColumns.forEach((key, i) => obj[key] = r[i] ?? "");
+        return obj;
+    });
+}
+
+fetch("/api/customers")
+    .then(r => r.json())
+    .then(rows => {
+        spreadsheet = jspreadsheet(document.getElementById("sheet"), {
+            worksheets: [{
+                data: objectRowsToArrayRows(rows),
+                columns: [
+                    { type: "hidden", title: "ID", width: 50 },
+                    { type: "text", title: "Navn *", width: 200 },
+                    { type: "text", title: "Org.nr", width: 120 },
+                    { type: "text", title: "Adresse", width: 250 },
+                    { type: "text", title: "E-post", width: 180 },
+                    { type: "text", title: "Telefon", width: 120 },
+                    { type: "text", title: "Deres ref.", width: 180 },
+                    { type: "text", title: "Ref. e-post", width: 180 },
+                    { type: "text", title: "Ref. telefon", width: 120 }
+                ],
+                minDimensions: [9, Math.max(rows.length + 1, 10)]
+            }]
+        });
+
+        sheet = spreadsheet[0];
+    });
+
+function addCustomer() {
+    sheet.insertRow();
+}
+
+function saveCustomers() {
+    const rows = arrayRowsToObjectRows(sheet.getData());
+
+    fetch("/api/customers", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(rows)
+    })
+    .then(r => r.json())
+    .then(() => alert("Lagret"));
+}
+</script>
+
+{% endblock %}
