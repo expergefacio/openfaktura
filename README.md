@@ -1,24 +1,6 @@
 # OpenFaktura
 
-Minimal self-hosted Norwegian invoice (`faktura`) system built with:
-
-- Ai
-- Flask
-- SQLite
-- ReportLab
-- jspreadsheet-ce
-- Docker
-
-Designed to stay intentionally simple:
-
-- no accounts/users
-- no external services
-- no email integration
-- no payment integration
-- no ERP/accounting system
-- locked invoices after creation
-- local PDF generation
-- LAN/selfhost friendly
+*** Super minimal *** self-hosted Norwegian invoice system largely built with ai.
 
 ---
 
@@ -246,38 +228,7 @@ tar xzf openfaktura-backup.tar.gz
 
 ---
 
-# Update
-
-Pull latest changes:
-
-```bash
-git pull
-docker compose up --build -d
-```
-
----
-
-# Notes
-
-This is intentionally an MVP/simple system.
-
-Not intended to replace:
-
-- Tripletex
-- Fiken
-- Visma
-- ERP/accounting systems
-
-Goal is:
-
-```text
-simple self-hosted invoice generation
-```
-
-for small/internal/simple use cases.
-
----
 
 # License
 
-MIT License.
+GNU LGPL
